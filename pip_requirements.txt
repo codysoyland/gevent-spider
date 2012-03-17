@@ -1,0 +1,5 @@
+Cython
+hg+https://bitbucket.org/denis/gevent
+gevent-websocket
+lxml
+requests

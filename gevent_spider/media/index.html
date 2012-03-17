@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Spider</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Web spider">
+    <meta name="author" content="Cody Soyland">
+
+    <link href="http://twitter.github.com/bootstrap/assets/css/bootstrap.css" rel="stylesheet">
+    <style>
+      body {
+        padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+      }
+    </style>
+    <link href="http://twitter.github.com/bootstrap/assets/css/bootstrap-responsive.css" rel="stylesheet">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+  </head>
+
+  <body>
+
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="#">gevent-spider</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+        <form id="form">
+            <formset>
+                <label for="url">URL:</label>
+                <input id="url" name="url" />
+                <input type="submit" />
+            </formset>
+        </form>
+        <p id="status"/>
+        <table id="results" class="table table-striped">
+            <tr>
+                <th>Status code</th>
+                <th>URL</th>
+                <th>Length (bytes)</th>
+                <th>Duration (milliseconds)</th>
+            </tr>
+        </table>
+
+    </div> <!-- /container -->
+
+    <script src="http://twitter.github.com/bootstrap/assets/js/jquery.js"></script>
+    <script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-transition.js"></script>
+    <script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-alert.js"></script>
+    <script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-modal.js"></script>
+    <script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-dropdown.js"></script>
+    <script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-scrollspy.js"></script>
+    <script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-tab.js"></script>
+    <script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-tooltip.js"></script>
+    <script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-popover.js"></script>
+    <script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-button.js"></script>
+    <script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-collapse.js"></script>
+    <script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-carousel.js"></script>
+    <script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-typeahead.js"></script>
+    <script type="text/javascript">
+        $(function() {
+            var WS = false;
+            if (window.WebSocket) WS = WebSocket;
+            if (!WS && window.MozWebSocket) WS = MozWebSocket;
+            if (!WS)
+                alert('Your browser does not seem to support Websockets.');
+
+            var $results = $('#results');
+            var $form = $('#form');
+            var $url = $('#url');
+            var $status = $('#status');
+
+            var ws = new WS('ws://localhost:8088/websocket');
+            ws.send_json = function(data) {
+                this.send(JSON.stringify(data));
+            }
+            ws.onopen = function() {
+                console.log('websocket connected');
+            };
+            ws.onmessage = function(message) {
+                console.log(message);
+                var data = JSON.parse(message.data);
+                switch (data.cmd) {
+                    case 'status':
+                        $status.html(data.status);
+                        break;
+                    case 'result':
+                        console.log(data.result);
+                        var result = data.result;
+                        var $result = $('<tr/>')
+                        $result.append($('<td>' + result.status_code + '</td>'))
+                        $result.append($('<td>' + result.url + '</td>'))
+                        $result.append($('<td>' + result.length + '</td>'))
+                        $result.append($('<td>' + (result.duration*1000) + '</td>'))
+                        $results.append($result);
+                        break;
+                }
+            };
+            ws.onclose = function() {
+                console.log('websocket closed');
+            };
+            $form.bind('submit', function(e) {
+                e.preventDefault();
+                var url = $url.val();
+                ws.send_json({cmd: 'scrape', url: url});
+                //$form.hide()
+                console.log(url);
+            });
+
+        });
+    </script>
+
+  </body>
+</html>
