@@ -2,4 +2,5 @@ Cython
 -e git://github.com/SiteSupport/gevent.git#egg=gevent
 gevent-websocket
 lxml
+cssselect
 requests
