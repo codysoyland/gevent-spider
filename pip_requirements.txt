@@ -1,5 +1,5 @@
 Cython
--e git://github.com/SiteSupport/gevent.git#egg=gevent
+http://gevent.googlecode.com/files/gevent-1.0b4.tar.gz
 gevent-websocket
 lxml
 cssselect
