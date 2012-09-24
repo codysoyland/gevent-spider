@@ -1,5 +1,5 @@
 Cython
-hg+https://bitbucket.org/denis/gevent
+-e git://github.com/SiteSupport/gevent.git#egg=gevent
 gevent-websocket
 lxml
 requests
