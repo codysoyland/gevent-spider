@@ -1,5 +1,6 @@
 Cython
-hg+https://bitbucket.org/denis/gevent
+http://gevent.googlecode.com/files/gevent-1.0b4.tar.gz
 gevent-websocket
 lxml
+cssselect
 requests
